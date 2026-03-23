@@ -5,6 +5,7 @@ import { WMTClient } from "./client.js"
 import { importCommands } from "./commands/slashCommands.js"
 import At from "./commands/text/at.js"
 import Help from "./commands/text/help.js"
+import { createServer } from "./server.js"
 
 // Get environment variables from .env file
 config()
@@ -27,6 +28,11 @@ client.on("ready", async () => {
 
   console.log("Fetching stations...")
   await client.fetchStations()
+
+  const port = process.env.PORT ? parseInt(process.env.PORT) : 3000
+  createServer(client).listen(port, () => {
+    console.log(`Listening for interactions on port ${port}`)
+  })
 
   console.log("Ready!")
 })
@@ -53,33 +59,6 @@ client.on("messageCreate", async (message) => {
   } catch (err) {
     console.error(err)
     await message.reply("There was an error trying to execute that command!")
-  }
-})
-
-client.on("interactionCreate", async (interaction) => {
-  if (interaction.isCommand()) {
-    const { commandName } = interaction
-
-    const command = client.commands.get(commandName)
-
-    if (!command) return
-
-    try {
-      await command.execute(interaction)
-    } catch (err) {
-      console.error(err)
-      await interaction.reply("There was an error trying to execute that command!")
-    }
-  } else if (interaction.isAutocomplete()) {
-    const command = client.commands.get(interaction.commandName)
-
-    if (!command) return
-
-    try {
-      await command.autocomplete(interaction, client.stations)
-    } catch (err) {
-      console.error(err)
-    }
   }
 })
 

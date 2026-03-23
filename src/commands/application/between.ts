@@ -1,4 +1,13 @@
-import { AutocompleteInteraction, SlashCommandBuilder } from "discord.js"
+import { SlashCommandBuilder } from "discord.js"
+import {
+  InteractionResponseType,
+  MessageFlags,
+  type APIChatInputApplicationCommandInteraction,
+  type APIApplicationCommandAutocompleteInteraction,
+  type APIApplicationCommandInteractionDataStringOption,
+  type APIInteractionResponse,
+  type APIApplicationCommandAutocompleteResponse,
+} from "discord-api-types/v10"
 import { betweenCommon } from "../common/between.js"
 import { RTTStation } from "../../types.js"
 import { stationAutocomplete } from "./autocomplete/station.js"
@@ -22,32 +31,58 @@ export const between = {
         .setRequired(true)
         .setAutocomplete(true)
     ),
-  execute: async (interaction) => {
-    const origin = interaction.options.getString("origin")
-    const destination = interaction.options.getString("destination")
+  execute: async (interaction: APIChatInputApplicationCommandInteraction): Promise<APIInteractionResponse> => {
+    const origin = (
+      interaction.data.options?.find((o) => o.name === "origin") as
+        | APIApplicationCommandInteractionDataStringOption
+        | undefined
+    )?.value ?? null
+
+    const destination = (
+      interaction.data.options?.find((o) => o.name === "destination") as
+        | APIApplicationCommandInteractionDataStringOption
+        | undefined
+    )?.value ?? null
 
     try {
       const embed = await betweenCommon(origin, destination)
 
-      await interaction.reply({ embeds: [embed] })
+      return {
+        type: InteractionResponseType.ChannelMessageWithSource,
+        data: { embeds: [embed.toJSON()] },
+      }
     } catch (err) {
       if (err.message === "unknown error occurred")
-        return await interaction.reply({ embeds: [error("Invalid station(s)!")], ephemeral: true })
+        return {
+          type: InteractionResponseType.ChannelMessageWithSource,
+          data: { embeds: [error("Invalid station(s)!").toJSON()], flags: MessageFlags.Ephemeral },
+        }
 
       console.error(err)
-      return await interaction.reply({
-        embeds: [error("There was an error trying to execute that command!")],
-        ephemeral: true,
-      })
+      return {
+        type: InteractionResponseType.ChannelMessageWithSource,
+        data: {
+          embeds: [error("There was an error trying to execute that command!").toJSON()],
+          flags: MessageFlags.Ephemeral,
+        },
+      }
     }
   },
-  autocomplete: async (interaction: AutocompleteInteraction, stations: RTTStation[]) => {
-    const focusedValue = interaction.options.getFocused().toLowerCase()
+  autocomplete: async (interaction: APIApplicationCommandAutocompleteInteraction, stations: RTTStation[]): Promise<APIApplicationCommandAutocompleteResponse> => {
+    const focused = interaction.data.options?.find((o) => "focused" in o && o.focused)
+    const focusedValue = (focused && "value" in focused ? (focused.value as string) : "").toLowerCase()
 
     try {
-      await interaction.respond(stationAutocomplete(focusedValue, stations))
+      return {
+        type: InteractionResponseType.ApplicationCommandAutocompleteResult,
+        data: { choices: stationAutocomplete(focusedValue, stations) },
+      }
     } catch (err) {
       console.error(err)
+      return {
+        type: InteractionResponseType.ApplicationCommandAutocompleteResult,
+        data: { choices: [] },
+      }
     }
   },
 }
