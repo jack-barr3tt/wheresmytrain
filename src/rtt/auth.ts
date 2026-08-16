@@ -1,6 +1,10 @@
 import { getApiGetAccessToken } from "../generated/rtt.js"
 import { RttUnavailableError } from "./errors.js"
-import { getValidUntilMs, setAccessToken, setRefreshHandler } from "./tokenStore.js"
+import {
+  getValidUntilMs,
+  setAccessToken,
+  setRefreshHandler,
+} from "./tokenStore.js"
 
 const REFRESH_SKEW_MS = 60_000
 
@@ -33,7 +37,10 @@ function scheduleRefresh() {
     clearTimeout(refreshTimer)
   }
 
-  const delay = Math.max(5_000, getValidUntilMs() - Date.now() - REFRESH_SKEW_MS)
+  const delay = Math.max(
+    5_000,
+    getValidUntilMs() - Date.now() - REFRESH_SKEW_MS,
+  )
   refreshTimer = setTimeout(() => {
     refreshAccessToken().catch((err) => {
       console.error("Failed to refresh RTT access token", err)

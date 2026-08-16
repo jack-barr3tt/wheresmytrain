@@ -18,5 +18,7 @@ export async function atCommon(stationCRS: string | null) {
   return new EmbedBuilder()
     .setTitle(`Next trains from ${station.locationName}`)
     .setColor("#39bdb8")
-    .setDescription(lines.length > 0 ? lines.join("\n") : "No trains found in the next hour.")
+    .setDescription(
+      lines.length > 0 ? lines.join("\n") : "No trains found in the next hour.",
+    )
 }

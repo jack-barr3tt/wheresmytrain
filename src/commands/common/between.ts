@@ -4,7 +4,10 @@ import { fetchLocation } from "../../rtt/location.js"
 import { stationName } from "../../rtt/stations.js"
 import { formatServiceLine, isPassengerService } from "./formatService.js"
 
-export async function betweenCommon(originCRS: string | null, destinationCRS: string | null) {
+export async function betweenCommon(
+  originCRS: string | null,
+  destinationCRS: string | null,
+) {
   if (!originCRS || !destinationCRS) {
     throw new InvalidQueryError()
   }
@@ -20,5 +23,7 @@ export async function betweenCommon(originCRS: string | null, destinationCRS: st
   return new EmbedBuilder()
     .setTitle(`${origin.locationName} to ${destination}`)
     .setColor("#39bdb8")
-    .setDescription(lines.length > 0 ? lines.join("\n") : "No trains found in the next hour.")
+    .setDescription(
+      lines.length > 0 ? lines.join("\n") : "No trains found in the next hour.",
+    )
 }

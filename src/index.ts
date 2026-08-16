@@ -46,7 +46,10 @@ client.on("messageCreate", async (message) => {
   const PREFIX = ","
   if (!message.content.startsWith(PREFIX)) return
 
-  const [CMD_NAME, ...args] = message.content.trim().substring(PREFIX.length).split(/\s+/)
+  const [CMD_NAME, ...args] = message.content
+    .trim()
+    .substring(PREFIX.length)
+    .split(/\s+/)
 
   try {
     switch (CMD_NAME) {

@@ -21,14 +21,16 @@ export const at = {
         .setName("station")
         .setDescription("The station to see upcoming departures for")
         .setRequired(true)
-        .setAutocomplete(true)
+        .setAutocomplete(true),
     ),
-  execute: async (interaction: APIChatInputApplicationCommandInteraction): Promise<APIInteractionResponse> => {
-    const station = (
-      interaction.data.options?.find((o) => o.name === "station") as
-        | APIApplicationCommandInteractionDataStringOption
-        | undefined
-    )?.value ?? null
+  execute: async (
+    interaction: APIChatInputApplicationCommandInteraction,
+  ): Promise<APIInteractionResponse> => {
+    const station =
+      (
+        interaction.data.options?.find((o) => o.name === "station") as
+          APIApplicationCommandInteractionDataStringOption | undefined
+      )?.value ?? null
 
     try {
       const embed = await atCommon(station)
@@ -41,9 +43,16 @@ export const at = {
       return slashFailureResponse(err)
     }
   },
-  autocomplete: async (interaction: APIApplicationCommandAutocompleteInteraction, stations: RTTStation[]): Promise<APIApplicationCommandAutocompleteResponse> => {
-    const focused = interaction.data.options?.find((o) => "focused" in o && o.focused)
-    const focusedValue = (focused && "value" in focused ? (focused.value as string) : "").toLowerCase()
+  autocomplete: async (
+    interaction: APIApplicationCommandAutocompleteInteraction,
+    stations: RTTStation[],
+  ): Promise<APIApplicationCommandAutocompleteResponse> => {
+    const focused = interaction.data.options?.find(
+      (o) => "focused" in o && o.focused,
+    )
+    const focusedValue = (
+      focused && "value" in focused ? (focused.value as string) : ""
+    ).toLowerCase()
 
     try {
       return {

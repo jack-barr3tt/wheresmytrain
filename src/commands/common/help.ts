@@ -5,7 +5,7 @@ export function helpCommon() {
     .setTitle("Help")
     .setColor("#39bdb8")
     .setDescription(
-      `Check UK train times without leaving Discord! Powered by [Realtime Trains](https://www.realtimetrains.co.uk/) :heart:`
+      `Check UK train times without leaving Discord! Powered by [Realtime Trains](https://www.realtimetrains.co.uk/) :heart:`,
     )
     .addFields([
       {

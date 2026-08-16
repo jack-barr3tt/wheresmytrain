@@ -1,5 +1,8 @@
 import { differenceInMinutes, format } from "date-fns"
-import type { IndividualTemporalData, NetworkRailLocationLineUpObject } from "../../generated/rtt.js"
+import type {
+  IndividualTemporalData,
+  NetworkRailLocationLineUpObject,
+} from "../../generated/rtt.js"
 import tocEmoji from "./emojis.js"
 
 export function isPassengerService(service: NetworkRailLocationLineUpObject) {
@@ -18,7 +21,9 @@ function activityTimes(service: NetworkRailLocationLineUpObject) {
   const temporal: IndividualTemporalData | undefined =
     service.temporalData?.departure ?? service.temporalData?.arrival
   const realtime = parseTime(
-    temporal?.realtimeActual ?? temporal?.realtimeForecast ?? temporal?.realtimeEstimate
+    temporal?.realtimeActual ??
+      temporal?.realtimeForecast ??
+      temporal?.realtimeEstimate,
   )
   const booked = parseTime(temporal?.scheduleAdvertised)
   const lateness =
@@ -30,7 +35,7 @@ function activityTimes(service: NetworkRailLocationLineUpObject) {
 
 export function formatServiceLine(
   service: NetworkRailLocationLineUpObject,
-  options: { includeDestination: boolean }
+  options: { includeDestination: boolean },
 ) {
   const { display, booked, lateness } = activityTimes(service)
   if (!display) {
@@ -41,13 +46,15 @@ export function formatServiceLine(
   const meta = service.scheduleMetadata
   const namespace = meta?.namespace ?? "gb-nr"
   const identity = meta?.identity
-  const departureDate = meta?.departureDate ?? format(booked ?? display, "yyyy-MM-dd")
+  const departureDate =
+    meta?.departureDate ?? format(booked ?? display, "yyyy-MM-dd")
   const rttLink = identity
     ? `https://www.realtimetrains.co.uk/service/${namespace}:${identity}/${departureDate}`
     : null
 
   const platform =
-    service.locationMetadata?.platform?.actual ?? service.locationMetadata?.platform?.planned
+    service.locationMetadata?.platform?.actual ??
+    service.locationMetadata?.platform?.planned
   const platformInfo = platform
     ? options.includeDestination
       ? `- Platform: ${platform}`
@@ -62,9 +69,11 @@ export function formatServiceLine(
     : ""
 
   const operatorCode = meta?.operator?.code
-  const operatorInfo = operatorCode && tocEmoji(operatorCode) ? `${tocEmoji(operatorCode)} ` : ""
+  const operatorInfo =
+    operatorCode && tocEmoji(operatorCode) ? `${tocEmoji(operatorCode)} ` : ""
   const timeBit = rttLink ? `[${formattedTime}](${rttLink})` : formattedTime
-  const latenessBit = lateness < 0 ? ` (${lateness})` : lateness > 0 ? ` (+${lateness})` : ""
+  const latenessBit =
+    lateness < 0 ? ` (${lateness})` : lateness > 0 ? ` (+${lateness})` : ""
   const destBit = destinationInfo ? ` ${destinationInfo}` : ""
   const platBit = platformInfo ? ` ${platformInfo}` : ""
 

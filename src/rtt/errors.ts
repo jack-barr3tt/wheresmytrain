@@ -1,7 +1,7 @@
 export class RttError extends Error {
   constructor(
     message: string,
-    readonly status?: number
+    readonly status?: number,
   ) {
     super(message)
     this.name = "RttError"
@@ -25,7 +25,7 @@ export class RateLimitedError extends RttError {
 export class RttUnavailableError extends RttError {
   constructor(
     status?: number,
-    readonly cause?: unknown
+    readonly cause?: unknown,
   ) {
     super("Realtime Trains unavailable", status)
     this.name = "RttUnavailableError"

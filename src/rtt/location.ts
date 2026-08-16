@@ -1,4 +1,8 @@
-import { getGbNrLocation, type GetGbNrLocation200, type NetworkRailLocationLineUpObject } from "../generated/rtt.js"
+import {
+  getGbNrLocation,
+  type GetGbNrLocation200,
+  type NetworkRailLocationLineUpObject,
+} from "../generated/rtt.js"
 import { cacheGet, cacheSet, locationCacheKey } from "./cache.js"
 
 export type LocationResult = {
@@ -6,14 +10,20 @@ export type LocationResult = {
   services: NetworkRailLocationLineUpObject[]
 }
 
-function toResult(code: string, data?: GetGbNrLocation200 | null): LocationResult {
+function toResult(
+  code: string,
+  data?: GetGbNrLocation200 | null,
+): LocationResult {
   return {
     locationName: data?.query?.location?.description ?? code,
     services: data?.services ?? [],
   }
 }
 
-export async function fetchLocation(code: string, filterTo?: string): Promise<LocationResult> {
+export async function fetchLocation(
+  code: string,
+  filterTo?: string,
+): Promise<LocationResult> {
   const normalised = code.toUpperCase()
   const filter = filterTo?.toUpperCase()
   const key = locationCacheKey(normalised, filter)
@@ -28,7 +38,9 @@ export async function fetchLocation(code: string, filterTo?: string): Promise<Lo
   })
 
   const result =
-    response.status === 200 ? toResult(normalised, response.data) : toResult(normalised)
+    response.status === 200
+      ? toResult(normalised, response.data)
+      : toResult(normalised)
   cacheSet(key, result)
   return result
 }

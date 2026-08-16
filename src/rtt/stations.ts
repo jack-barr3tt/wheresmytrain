@@ -28,6 +28,8 @@ export async function loadStops(): Promise<RTTStation[]> {
 }
 
 export function stationName(crs: string) {
-  const found = stations.find((station) => station.crs.toLowerCase() === crs.toLowerCase())
+  const found = stations.find(
+    (station) => station.crs.toLowerCase() === crs.toLowerCase(),
+  )
   return found?.description ?? crs.toUpperCase()
 }

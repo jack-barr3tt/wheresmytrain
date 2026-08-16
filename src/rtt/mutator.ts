@@ -1,6 +1,18 @@
-import { InvalidQueryError, RateLimitedError, RttUnavailableError } from "./errors.js"
-import { assertCanRequest, getRetryAfterSeconds, recordFromHeaders } from "./rateLimit.js"
-import { getAccessToken, getRefreshToken, runRefreshHandler } from "./tokenStore.js"
+import {
+  InvalidQueryError,
+  RateLimitedError,
+  RttUnavailableError,
+} from "./errors.js"
+import {
+  assertCanRequest,
+  getRetryAfterSeconds,
+  recordFromHeaders,
+} from "./rateLimit.js"
+import {
+  getAccessToken,
+  getRefreshToken,
+  runRefreshHandler,
+} from "./tokenStore.js"
 
 const API_VERSION = "2026-07-25"
 
@@ -56,7 +68,10 @@ async function send(url: string, options: RequestInit, token: string) {
   }
 }
 
-export async function rttFetch<T>(url: string, options: RequestInit): Promise<T> {
+export async function rttFetch<T>(
+  url: string,
+  options: RequestInit,
+): Promise<T> {
   const refresh = isRefreshRequest(url)
   if (!refresh) {
     assertCanRequest()
@@ -86,5 +101,9 @@ export async function rttFetch<T>(url: string, options: RequestInit): Promise<T>
     errorFromStatus(response.status)
   }
 
-  return { data, status: response.status, headers: response.headers } as RttFetchResponse<unknown> as T
+  return {
+    data,
+    status: response.status,
+    headers: response.headers,
+  } as RttFetchResponse<unknown> as T
 }
