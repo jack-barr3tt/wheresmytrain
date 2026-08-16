@@ -10,7 +10,7 @@ set -eu
 tar czf release.tar.gz deploy scripts/deploy.sh
 
 mkdir -p ~/.ssh && chmod 700 ~/.ssh
-printf '%s' "$SSH_KEY" > ~/.ssh/id_ed25519
+echo "$SSH_KEY" | base64 -d > ~/.ssh/id_ed25519
 chmod 600 ~/.ssh/id_ed25519
 ssh-keyscan -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts 2>/dev/null
 
