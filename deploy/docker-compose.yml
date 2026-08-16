@@ -9,6 +9,7 @@ services:
       - .env
     volumes:
       - .env:/app/.env:ro
+      - ./toc_emojis.json:/app/toc_emojis.json:ro
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/health"]
