@@ -6,6 +6,7 @@ import { importCommands } from "./commands/slashCommands.js"
 import At from "./commands/text/at.js"
 import Help from "./commands/text/help.js"
 import { createServer } from "./server.js"
+import { initRttAuth } from "./rtt/auth.js"
 
 // Get environment variables from .env file
 config()
@@ -26,6 +27,9 @@ client.on("ready", async () => {
   console.log("Uploading commands...")
   await client.uploadCommands()
 
+  console.log("Authenticating with Realtime Trains...")
+  await initRttAuth()
+
   console.log("Fetching stations...")
   await client.fetchStations()
 
@@ -42,7 +46,10 @@ client.on("messageCreate", async (message) => {
   const PREFIX = ","
   if (!message.content.startsWith(PREFIX)) return
 
-  const [CMD_NAME, ...args] = message.content.trim().substring(PREFIX.length).split(/\s+/)
+  const [CMD_NAME, ...args] = message.content
+    .trim()
+    .substring(PREFIX.length)
+    .split(/\s+/)
 
   try {
     switch (CMD_NAME) {

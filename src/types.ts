@@ -8,9 +8,16 @@ import type {
 
 export type CommandConfig = {
   name: string
-  data: SlashCommandBuilder | Omit<SlashCommandBuilder, "addSubcommand" | "addSubcommandGroup">
-  execute: (interaction: APIChatInputApplicationCommandInteraction) => Promise<APIInteractionResponse>
-  autocomplete?: (interaction: APIApplicationCommandAutocompleteInteraction, stations: RTTStation[]) => Promise<APIApplicationCommandAutocompleteResponse>
+  data:
+    | SlashCommandBuilder
+    | Omit<SlashCommandBuilder, "addSubcommand" | "addSubcommandGroup">
+  execute: (
+    interaction: APIChatInputApplicationCommandInteraction,
+  ) => Promise<APIInteractionResponse>
+  autocomplete?: (
+    interaction: APIApplicationCommandAutocompleteInteraction,
+    stations: RTTStation[],
+  ) => Promise<APIApplicationCommandAutocompleteResponse>
 }
 
 export type RTTStation = {

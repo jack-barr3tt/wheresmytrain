@@ -1,7 +1,6 @@
 import { SlashCommandBuilder } from "discord.js"
 import {
   InteractionResponseType,
-  MessageFlags,
   type APIChatInputApplicationCommandInteraction,
   type APIApplicationCommandAutocompleteInteraction,
   type APIApplicationCommandInteractionDataStringOption,
@@ -11,7 +10,7 @@ import {
 import { RTTStation } from "../../types.js"
 import { stationAutocomplete } from "./autocomplete/station.js"
 import { atCommon } from "../common/at.js"
-import { error } from "../common/error.js"
+import { slashFailureResponse } from "../common/error.js"
 
 export const at = {
   name: "at",
@@ -22,14 +21,16 @@ export const at = {
         .setName("station")
         .setDescription("The station to see upcoming departures for")
         .setRequired(true)
-        .setAutocomplete(true)
+        .setAutocomplete(true),
     ),
-  execute: async (interaction: APIChatInputApplicationCommandInteraction): Promise<APIInteractionResponse> => {
-    const station = (
-      interaction.data.options?.find((o) => o.name === "station") as
-        | APIApplicationCommandInteractionDataStringOption
-        | undefined
-    )?.value ?? null
+  execute: async (
+    interaction: APIChatInputApplicationCommandInteraction,
+  ): Promise<APIInteractionResponse> => {
+    const station =
+      (
+        interaction.data.options?.find((o) => o.name === "station") as
+          APIApplicationCommandInteractionDataStringOption | undefined
+      )?.value ?? null
 
     try {
       const embed = await atCommon(station)
@@ -39,25 +40,19 @@ export const at = {
         data: { embeds: [embed.toJSON()] },
       }
     } catch (err) {
-      if (err.message === "unknown error occurred")
-        return {
-          type: InteractionResponseType.ChannelMessageWithSource,
-          data: { embeds: [error("Invalid station!").toJSON()], flags: MessageFlags.Ephemeral },
-        }
-
-      console.error(err)
-      return {
-        type: InteractionResponseType.ChannelMessageWithSource,
-        data: {
-          embeds: [error("There was an error trying to execute that command!").toJSON()],
-          flags: MessageFlags.Ephemeral,
-        },
-      }
+      return slashFailureResponse(err)
     }
   },
-  autocomplete: async (interaction: APIApplicationCommandAutocompleteInteraction, stations: RTTStation[]): Promise<APIApplicationCommandAutocompleteResponse> => {
-    const focused = interaction.data.options?.find((o) => "focused" in o && o.focused)
-    const focusedValue = (focused && "value" in focused ? (focused.value as string) : "").toLowerCase()
+  autocomplete: async (
+    interaction: APIApplicationCommandAutocompleteInteraction,
+    stations: RTTStation[],
+  ): Promise<APIApplicationCommandAutocompleteResponse> => {
+    const focused = interaction.data.options?.find(
+      (o) => "focused" in o && o.focused,
+    )
+    const focusedValue = (
+      focused && "value" in focused ? (focused.value as string) : ""
+    ).toLowerCase()
 
     try {
       return {

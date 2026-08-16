@@ -1,0 +1,55 @@
+when:
+  - event: push
+    branch: main
+
+concurrency:
+  limit: 1
+
+steps:
+  - name: lint
+    image: node:22-alpine
+    commands:
+      - corepack enable
+      - yarn install --frozen-lockfile
+      - yarn lint
+
+  - name: build
+    image: docker:27-cli
+    depends_on:
+      - lint
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      REGISTRY: ghcr.io/jack-barr3tt
+      REGISTRY_USER:
+        from_secret: registry_user
+      REGISTRY_TOKEN:
+        from_secret: registry_token
+      IMAGE_TAG: ${CI_COMMIT_SHA}
+    commands:
+      - echo "$REGISTRY_TOKEN" | docker login ghcr.io -u "$REGISTRY_USER" --password-stdin
+      - |
+        docker build -f deploy/Dockerfile \
+          -t "$REGISTRY/wheresmytrain:$IMAGE_TAG" \
+          -t "$REGISTRY/wheresmytrain:latest" \
+          .
+      - docker push "$REGISTRY/wheresmytrain:$IMAGE_TAG"
+      - docker push "$REGISTRY/wheresmytrain:latest"
+
+  - name: deploy
+    image: alpine:3.20
+    depends_on:
+      - build
+    environment:
+      SSH_KEY:
+        from_secret: deploy_ssh_key
+      DEPLOY_HOST:
+        from_secret: deploy_host
+      DEPLOY_USER:
+        from_secret: deploy_user
+      DEPLOY_PATH:
+        from_secret: deploy_path
+      IMAGE_TAG: ${CI_COMMIT_SHA}
+    commands:
+      - apk add --no-cache openssh-client tar
+      - sh scripts/ci-deploy.sh

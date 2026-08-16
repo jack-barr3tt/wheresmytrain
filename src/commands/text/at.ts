@@ -1,6 +1,6 @@
 import { Message } from "discord.js"
 import { atCommon } from "../common/at.js"
-import { error } from "../common/error.js"
+import { commandFailure, error } from "../common/error.js"
 
 export default async function At(message: Message<boolean>, args: string[]) {
   if (args.length != 1) {
@@ -21,12 +21,7 @@ export default async function At(message: Message<boolean>, args: string[]) {
 
     await message.reply({ embeds: [embed] })
   } catch (err) {
-    if (err.message === "unknown error occurred")
-      return await message.reply({ embeds: [error("Invalid station!")] })
-
-    console.error(err)
-    return await message.reply({
-      embeds: [error("There was an error trying to execute that command!")],
-    })
+    const { embed } = commandFailure(err)
+    return await message.reply({ embeds: [embed] })
   }
 }

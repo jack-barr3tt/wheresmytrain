@@ -6,25 +6,36 @@
   "type": "module",
   "scripts": {
     "build": "tsc",
-    "start": "tsc && node ."
+    "generate": "orval",
+    "start": "tsc && node .",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "keywords": [],
   "author": "Jack Barrett <jjbdev21@gmail.com>",
   "license": "ISC",
   "devDependencies": {
-    "discord-api-types": "^0.37.90",
+    "@eslint/js": "9.11.1",
     "@types/express": "^5.0.0",
     "@types/lodash": "^4.17.5",
-    "typescript": "^5.3.3"
+    "eslint": "9.11.1",
+    "eslint-config-prettier": "10.1.8",
+    "eslint-plugin-prettier": "5.5.6",
+    "globals": "15.10.0",
+    "orval": "7.13.2",
+    "prettier": "^3.9.6",
+    "typescript": "^5.3.3",
+    "typescript-eslint": "8.8.0"
   },
   "repository": "git@github.com:jack-barr3tt/discord-rtt.git",
   "dependencies": {
     "date-fns": "^3.3.1",
+    "discord-api-types": "^0.37.90",
     "discord.js": "^14.14.1",
     "dotenv": "^16.4.1",
     "express": "^4.21.0",
     "lodash": "^4.17.21",
-    "rttapi": "0.1.1",
     "tweetnacl": "^1.0.3"
   }
 }

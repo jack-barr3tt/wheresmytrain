@@ -14,6 +14,10 @@ export function createServer(client: WMTClient) {
   // Use raw body parsing so the unmodified bytes are available for signature verification
   app.use(express.raw({ type: "application/json" }))
 
+  app.get("/health", (_req: Request, res: Response) => {
+    res.json({ status: "ok" })
+  })
+
   app.post("/interactions", async (req: Request, res: Response) => {
     const signature = req.headers["x-signature-ed25519"] as string | undefined
     const timestamp = req.headers["x-signature-timestamp"] as string | undefined
@@ -30,7 +34,7 @@ export function createServer(client: WMTClient) {
     const isValid = nacl.sign.detached.verify(
       new Uint8Array(message),
       new Uint8Array(sig),
-      new Uint8Array(publicKey)
+      new Uint8Array(publicKey),
     )
 
     if (!isValid) {
@@ -54,7 +58,9 @@ export function createServer(client: WMTClient) {
       }
 
       try {
-        const response = await command.execute(interaction as APIChatInputApplicationCommandInteraction)
+        const response = await command.execute(
+          interaction as APIChatInputApplicationCommandInteraction,
+        )
         res.json(response)
       } catch (err) {
         console.error(err)
@@ -68,19 +74,25 @@ export function createServer(client: WMTClient) {
       const command = client.commands.get(interaction.data.name)
 
       if (!command?.autocomplete) {
-        res.json({ type: InteractionResponseType.ApplicationCommandAutocompleteResult, data: { choices: [] } })
+        res.json({
+          type: InteractionResponseType.ApplicationCommandAutocompleteResult,
+          data: { choices: [] },
+        })
         return
       }
 
       try {
         const response = await command.autocomplete(
           interaction as APIApplicationCommandAutocompleteInteraction,
-          client.stations
+          client.stations,
         )
         res.json(response)
       } catch (err) {
         console.error(err)
-        res.json({ type: InteractionResponseType.ApplicationCommandAutocompleteResult, data: { choices: [] } })
+        res.json({
+          type: InteractionResponseType.ApplicationCommandAutocompleteResult,
+          data: { choices: [] },
+        })
       }
 
       return
