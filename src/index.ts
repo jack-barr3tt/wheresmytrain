@@ -6,6 +6,7 @@ import { importCommands } from "./commands/slashCommands.js"
 import At from "./commands/text/at.js"
 import Help from "./commands/text/help.js"
 import { createServer } from "./server.js"
+import { initRttAuth } from "./rtt/auth.js"
 
 // Get environment variables from .env file
 config()
@@ -25,6 +26,9 @@ client.on("ready", async () => {
 
   console.log("Uploading commands...")
   await client.uploadCommands()
+
+  console.log("Authenticating with Realtime Trains...")
+  await initRttAuth()
 
   console.log("Fetching stations...")
   await client.fetchStations()

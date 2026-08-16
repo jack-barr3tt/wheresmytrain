@@ -9,6 +9,7 @@ import {
 } from "discord.js"
 import { ApplicationIntegrationType } from "discord-api-types/v10"
 import { CommandConfig, RTTStation } from "./types.js"
+import { loadStops } from "./rtt/stations.js"
 import { config } from "dotenv"
 import loadashpkg from "lodash"
 
@@ -201,9 +202,11 @@ export class WMTClient extends Client {
   }
 
   async fetchStations() {
-    const req = await fetch("https://www.realtimetrains.co.uk/php/ajax_search.php?type=stations")
-    const res = await req.json()
-
-    this.stations = res
+    try {
+      this.stations = await loadStops()
+    } catch (err) {
+      console.error("Failed to fetch station list", err)
+      this.stations = []
+    }
   }
 }

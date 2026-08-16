@@ -1,7 +1,6 @@
 import { SlashCommandBuilder } from "discord.js"
 import {
   InteractionResponseType,
-  MessageFlags,
   type APIChatInputApplicationCommandInteraction,
   type APIApplicationCommandAutocompleteInteraction,
   type APIApplicationCommandInteractionDataStringOption,
@@ -11,7 +10,7 @@ import {
 import { betweenCommon } from "../common/between.js"
 import { RTTStation } from "../../types.js"
 import { stationAutocomplete } from "./autocomplete/station.js"
-import { error } from "../common/error.js"
+import { slashFailureResponse } from "../common/error.js"
 
 export const between = {
   name: "between",
@@ -52,20 +51,7 @@ export const between = {
         data: { embeds: [embed.toJSON()] },
       }
     } catch (err) {
-      if (err.message === "unknown error occurred")
-        return {
-          type: InteractionResponseType.ChannelMessageWithSource,
-          data: { embeds: [error("Invalid station(s)!").toJSON()], flags: MessageFlags.Ephemeral },
-        }
-
-      console.error(err)
-      return {
-        type: InteractionResponseType.ChannelMessageWithSource,
-        data: {
-          embeds: [error("There was an error trying to execute that command!").toJSON()],
-          flags: MessageFlags.Ephemeral,
-        },
-      }
+      return slashFailureResponse(err)
     }
   },
   autocomplete: async (interaction: APIApplicationCommandAutocompleteInteraction, stations: RTTStation[]): Promise<APIApplicationCommandAutocompleteResponse> => {

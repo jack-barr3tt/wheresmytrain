@@ -6,15 +6,18 @@
   "type": "module",
   "scripts": {
     "build": "tsc",
+    "generate": "orval",
     "start": "tsc && node ."
   },
   "keywords": [],
   "author": "Jack Barrett <jjbdev21@gmail.com>",
   "license": "ISC",
   "devDependencies": {
-    "discord-api-types": "^0.37.90",
     "@types/express": "^5.0.0",
     "@types/lodash": "^4.17.5",
+    "discord-api-types": "^0.37.90",
+    "orval": "7.13.2",
+    "prettier": "^3.9.6",
     "typescript": "^5.3.3"
   },
   "repository": "git@github.com:jack-barr3tt/discord-rtt.git",
@@ -24,7 +27,6 @@
     "dotenv": "^16.4.1",
     "express": "^4.21.0",
     "lodash": "^4.17.21",
-    "rttapi": "0.1.1",
     "tweetnacl": "^1.0.3"
   }
 }
