@@ -26,7 +26,7 @@ export function cacheSet<T>(key: string, value: T) {
 export function locationCacheKey(
   code: string,
   filterTo?: string,
-  includeRealtime = true,
+  timeWindowMinutes?: number,
 ) {
-  return `location:${code.toUpperCase()}:${filterTo?.toUpperCase() ?? ""}:${includeRealtime ? "rt" : "sched"}`
+  return `location:${code.toUpperCase()}:${filterTo?.toUpperCase() ?? ""}:${timeWindowMinutes ?? 60}`
 }

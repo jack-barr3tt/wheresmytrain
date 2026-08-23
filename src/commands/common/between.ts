@@ -22,6 +22,8 @@ export async function betweenCommon(
     .setTitle(`${origin.locationName} to ${destination}`)
     .setColor("#39bdb8")
     .setDescription(
-      lines.length > 0 ? lines.join("\n") : "No trains found in the next hour.",
+      lines.length > 0
+        ? lines.join("\n")
+        : "No trains found in the next 5 hours.",
     )
 }

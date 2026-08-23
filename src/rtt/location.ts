@@ -11,7 +11,7 @@ export type LocationResult = {
 }
 
 export type FetchLocationOptions = {
-  includeRealtime?: boolean
+  timeWindowMinutes?: number
 }
 
 function toResult(
@@ -24,39 +24,25 @@ function toResult(
   }
 }
 
-function requestInit(includeRealtime: boolean): RequestInit | undefined {
-  if (includeRealtime) {
-    return undefined
-  }
-
-  return {
-    headers: {
-      Realtime: "false",
-    },
-  }
-}
-
 export async function fetchLocation(
   code: string,
   filterTo?: string,
   options: FetchLocationOptions = {},
 ): Promise<LocationResult> {
-  const includeRealtime = options.includeRealtime ?? true
+  const timeWindowMinutes = options.timeWindowMinutes
   const normalised = code.toUpperCase()
   const filter = filterTo?.toUpperCase()
-  const key = locationCacheKey(normalised, filter, includeRealtime)
+  const key = locationCacheKey(normalised, filter, timeWindowMinutes)
   const cached = cacheGet<LocationResult>(key)
   if (cached) {
     return cached
   }
 
-  const response = await getGbNrLocation(
-    {
-      code: normalised,
-      ...(filter ? { filterTo: filter } : {}),
-    },
-    requestInit(includeRealtime),
-  )
+  const response = await getGbNrLocation({
+    code: normalised,
+    ...(filter ? { filterTo: filter } : {}),
+    ...(timeWindowMinutes ? { timeWindow: timeWindowMinutes } : {}),
+  })
 
   const result =
     response.status === 200
