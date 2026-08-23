@@ -1,8 +1,8 @@
 import { EmbedBuilder } from "discord.js"
 import { InvalidQueryError } from "../../rtt/errors.js"
-import { fetchLocation } from "../../rtt/location.js"
 import { stationName } from "../../rtt/stations.js"
-import { formatServiceLine, isPassengerService } from "./formatService.js"
+import { fetchLocationBoard } from "./locationBoard.js"
+import { formatServiceLine } from "./formatService.js"
 
 export async function betweenCommon(
   originCRS: string | null,
@@ -12,11 +12,9 @@ export async function betweenCommon(
     throw new InvalidQueryError()
   }
 
-  const origin = await fetchLocation(originCRS, destinationCRS)
+  const origin = await fetchLocationBoard(originCRS, destinationCRS)
   const destination = stationName(destinationCRS)
   const lines = origin.services
-    .filter(isPassengerService)
-    .slice(0, 3)
     .map((service) => formatServiceLine(service, { includeDestination: false }))
     .filter((line): line is string => Boolean(line))
 

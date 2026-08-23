@@ -1,17 +1,15 @@
 import { EmbedBuilder } from "discord.js"
 import { InvalidQueryError } from "../../rtt/errors.js"
-import { fetchLocation } from "../../rtt/location.js"
-import { formatServiceLine, isPassengerService } from "./formatService.js"
+import { fetchLocationBoard } from "./locationBoard.js"
+import { formatServiceLine } from "./formatService.js"
 
 export async function atCommon(stationCRS: string | null) {
   if (!stationCRS) {
     throw new InvalidQueryError()
   }
 
-  const station = await fetchLocation(stationCRS)
+  const station = await fetchLocationBoard(stationCRS)
   const lines = station.services
-    .filter(isPassengerService)
-    .slice(0, 5)
     .map((service) => formatServiceLine(service, { includeDestination: true }))
     .filter((line): line is string => Boolean(line))
 
