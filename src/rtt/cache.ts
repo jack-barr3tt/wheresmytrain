@@ -23,10 +23,6 @@ export function cacheSet<T>(key: string, value: T) {
   cache.set(key, { value, expiresAt: Date.now() + TTL_MS })
 }
 
-export function locationCacheKey(
-  code: string,
-  filterTo?: string,
-  timeWindowMinutes?: number,
-) {
-  return `location:${code.toUpperCase()}:${filterTo?.toUpperCase() ?? ""}:${timeWindowMinutes ?? 60}`
+export function locationCacheKey(code: string, filterTo?: string) {
+  return `location:${code.toUpperCase()}:${filterTo?.toUpperCase() ?? ""}`
 }

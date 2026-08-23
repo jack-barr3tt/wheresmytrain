@@ -10,10 +10,6 @@ export type LocationResult = {
   services: NetworkRailLocationLineUpObject[]
 }
 
-export type FetchLocationOptions = {
-  timeWindowMinutes?: number
-}
-
 function toResult(
   code: string,
   data?: GetGbNrLocation200 | null,
@@ -27,12 +23,10 @@ function toResult(
 export async function fetchLocation(
   code: string,
   filterTo?: string,
-  options: FetchLocationOptions = {},
 ): Promise<LocationResult> {
-  const timeWindowMinutes = options.timeWindowMinutes
   const normalised = code.toUpperCase()
   const filter = filterTo?.toUpperCase()
-  const key = locationCacheKey(normalised, filter, timeWindowMinutes)
+  const key = locationCacheKey(normalised, filter)
   const cached = cacheGet<LocationResult>(key)
   if (cached) {
     return cached
@@ -41,7 +35,7 @@ export async function fetchLocation(
   const response = await getGbNrLocation({
     code: normalised,
     ...(filter ? { filterTo: filter } : {}),
-    ...(timeWindowMinutes ? { timeWindow: timeWindowMinutes } : {}),
+    timeWindow: 300,
   })
 
   const result =
