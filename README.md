@@ -6,12 +6,12 @@ Use the [Realtime Trains API](https://www.realtimetrains.co.uk/) from your Disco
 
 ## 📝 Text Commands
 
-- `,t <station> <station>` - Get the next 3 trains between two stations using their [CRS codes](https://www.rail-record.co.uk/railway-location-codes)
+- `,t <station> <station>` - Get the next 5 trains between two stations using their [CRS codes](https://www.rail-record.co.uk/railway-location-codes)
 - `,a <station>` - Get the next 5 departures from a station using its [CRS code](https://www.rail-record.co.uk/railway-location-codes)
 
 ## ✨ Slash Commands
 
-- `/between <station> <station>` - Get the next 3 trains between two stations.
+- `/between <station> <station>` - Get the next 5 trains between two stations.
 - `/at <station>` - Get the next 5 departures from a station.
 
 All station fields have autocomplete, so you can use the station name or the CRS code - whatever you prefer!

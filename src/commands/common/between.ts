@@ -16,7 +16,7 @@ export async function betweenCommon(
   const destination = stationName(destinationCRS)
   const lines = origin.services
     .filter(isPassengerService)
-    .slice(0, 3)
+    .slice(0, 5)
     .map((service) => formatServiceLine(service, { includeDestination: false }))
     .filter((line): line is string => Boolean(line))
 
@@ -24,6 +24,8 @@ export async function betweenCommon(
     .setTitle(`${origin.locationName} to ${destination}`)
     .setColor("#39bdb8")
     .setDescription(
-      lines.length > 0 ? lines.join("\n") : "No trains found in the next hour.",
+      lines.length > 0
+        ? lines.join("\n")
+        : "No trains found in the next 5 hours.",
     )
 }

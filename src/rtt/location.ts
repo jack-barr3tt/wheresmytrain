@@ -35,6 +35,7 @@ export async function fetchLocation(
   const response = await getGbNrLocation({
     code: normalised,
     ...(filter ? { filterTo: filter } : {}),
+    timeWindow: 300,
   })
 
   const result =
