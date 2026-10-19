@@ -10,12 +10,14 @@ export REGISTRY IMAGE_TAG
 cd "$DEPLOY_PATH"
 
 docker compose -f deploy/docker-compose.yml pull
-docker compose -f deploy/docker-compose.yml down --remove-orphans
 
-# This project's `down` does not see a container started under an older
-# project name. That container keeps the published host port, and the new
-# one then fails with "address already in use".
-for id in $(docker ps -aq); do
+# Drop this bot's container from the old shared "deploy" project so it
+# releases the host port. Do not `compose down`: deploy_default still has
+# the other apps attached.
+old=$(docker ps -aq \
+  --filter label=com.docker.compose.project=deploy \
+  --filter label=com.docker.compose.service=bot)
+for id in $old; do
   image=$(docker inspect -f '{{.Config.Image}}' "$id" 2>/dev/null || true)
   case "$image" in
     "$REGISTRY/wheresmytrain:"*)
@@ -24,4 +26,4 @@ for id in $(docker ps -aq); do
   esac
 done
 
-docker compose -f deploy/docker-compose.yml up -d --remove-orphans
+docker compose -f deploy/docker-compose.yml up -d

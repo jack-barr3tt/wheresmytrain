@@ -1,3 +1,7 @@
+# The compose file lives in deploy/, so the default project name is "deploy".
+# Other apps on this host use that same folder name and share deploy_default.
+name: wheresmytrain
+
 services:
   bot:
     image: ${REGISTRY}/wheresmytrain:${IMAGE_TAG}
