@@ -1,3 +1,5 @@
+name: wheresmytrain
+
 services:
   bot:
     image: ${REGISTRY}/wheresmytrain:${IMAGE_TAG}
