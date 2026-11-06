@@ -1,3 +1,5 @@
+import { format, isMatch, isValid, parse } from "date-fns"
+import { formatInTimeZone } from "date-fns-tz"
 import { InvalidTimeError } from "../../rtt/errors.js"
 
 export type QueryTime = {
@@ -7,42 +9,19 @@ export type QueryTime = {
   timeFrom: string
 }
 
-function londonDate(now: Date): string {
-  const parts = new Intl.DateTimeFormat("en-GB", {
-    timeZone: "Europe/London",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).formatToParts(now)
-  const value = (type: Intl.DateTimeFormatPartTypes) =>
-    parts.find((part) => part.type === type)?.value
-  const year = value("year")
-  const month = value("month")
-  const day = value("day")
-  if (!year || !month || !day) {
-    throw new InvalidTimeError()
-  }
-  return `${year}-${month}-${day}`
+const TIME_ZONE = "Europe/London"
+
+/** Colon times, then 12-hour colon times. Compact times are separate so 1430 is not read as 1:43. */
+const COLON_FORMATS = ["H:mm", "h:mma", "h:mmaaaa"]
+const COMPACT_FORMATS = ["HHmm", "Hmm", "ha", "haaaa"]
+
+function formatsFor(value: string): string[] {
+  return value.includes(":") ? COLON_FORMATS : COMPACT_FORMATS
 }
 
-function toQueryTime(hours: number, minutes: number, now: Date): QueryTime {
-  if (
-    !Number.isInteger(hours) ||
-    !Number.isInteger(minutes) ||
-    hours < 0 ||
-    hours > 23 ||
-    minutes < 0 ||
-    minutes > 59
-  ) {
-    throw new InvalidTimeError()
-  }
-
-  const hh = String(hours).padStart(2, "0")
-  const mm = String(minutes).padStart(2, "0")
-  return {
-    label: `${hh}:${mm}`,
-    timeFrom: `${londonDate(now)}T${hh}:${mm}:00`,
-  }
+function londonReference(now: Date): Date {
+  const day = formatInTimeZone(now, TIME_ZONE, "yyyy-MM-dd")
+  return parse(day, "yyyy-MM-dd", now)
 }
 
 /**
@@ -66,34 +45,21 @@ export function parseQueryTime(
     return undefined
   }
 
-  const colon = value.match(/^(\d{1,2}):(\d{2})$/)
-  if (colon) {
-    return toQueryTime(Number(colon[1]), Number(colon[2]), now)
-  }
-
-  const compact = value.match(/^(\d{3,4})$/)
-  if (compact) {
-    const digits = compact[1]
-    return toQueryTime(
-      Number(digits.slice(0, -2)),
-      Number(digits.slice(-2)),
-      now,
-    )
-  }
-
-  const twelveHour = value.match(/^(\d{1,2})(?::(\d{2}))?([ap])\.?m\.?$/)
-  if (twelveHour) {
-    let hours = Number(twelveHour[1])
-    const minutes = twelveHour[2] ? Number(twelveHour[2]) : 0
-    if (hours < 1 || hours > 12) {
-      throw new InvalidTimeError()
+  const reference = londonReference(now)
+  for (const pattern of formatsFor(value)) {
+    if (!isMatch(value, pattern)) {
+      continue
     }
-    if (twelveHour[3] === "a") {
-      if (hours === 12) hours = 0
-    } else if (hours !== 12) {
-      hours += 12
+
+    const parsed = parse(value, pattern, reference)
+    if (!isValid(parsed)) {
+      continue
     }
-    return toQueryTime(hours, minutes, now)
+
+    return {
+      label: format(parsed, "HH:mm"),
+      timeFrom: format(parsed, "yyyy-MM-dd'T'HH:mm:ss"),
+    }
   }
 
   throw new InvalidTimeError()
