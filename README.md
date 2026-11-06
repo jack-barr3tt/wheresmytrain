@@ -11,8 +11,8 @@ Use the [Realtime Trains API](https://www.realtimetrains.co.uk/) from your Disco
 
 ## ✨ Slash Commands
 
-- `/between <station> <station>` - Get the next 5 trains between two stations.
-- `/at <station>` - Get the next 5 departures from a station.
+- `/between <station> <station> [time]` - Get the next 5 trains between two stations. `time` is optional (`14:30`, `1430`, or `2:30pm`) and uses today's date.
+- `/at <station> [time]` - Get the next 5 departures from a station, optionally starting from a time today.
 
 All station fields have autocomplete, so you can use the station name or the CRS code - whatever you prefer!
 

@@ -11,6 +11,7 @@ import { RTTStation } from "../../types.js"
 import { stationAutocomplete } from "./autocomplete/station.js"
 import { atCommon } from "../common/at.js"
 import { slashFailureResponse } from "../common/error.js"
+import { parseQueryTime } from "../common/queryTime.js"
 
 export const at = {
   name: "at",
@@ -22,6 +23,14 @@ export const at = {
         .setDescription("The station to see upcoming departures for")
         .setRequired(true)
         .setAutocomplete(true),
+    )
+    .addStringOption((option) =>
+      option
+        .setName("time")
+        .setDescription(
+          "Optional time today to search from, such as 14:30, 1430, or 2:30pm",
+        )
+        .setRequired(false),
     ),
   execute: async (
     interaction: APIChatInputApplicationCommandInteraction,
@@ -32,8 +41,13 @@ export const at = {
           APIApplicationCommandInteractionDataStringOption | undefined
       )?.value ?? null
 
+    const time = (
+      interaction.data.options?.find((o) => o.name === "time") as
+        APIApplicationCommandInteractionDataStringOption | undefined
+    )?.value
+
     try {
-      const embed = await atCommon(station)
+      const embed = await atCommon(station, parseQueryTime(time))
 
       return {
         type: InteractionResponseType.ChannelMessageWithSource,
@@ -50,6 +64,12 @@ export const at = {
     const focused = interaction.data.options?.find(
       (o) => "focused" in o && o.focused,
     )
+    if (!focused || focused.name !== "station") {
+      return {
+        type: InteractionResponseType.ApplicationCommandAutocompleteResult,
+        data: { choices: [] },
+      }
+    }
     const focusedValue = (
       focused && "value" in focused ? (focused.value as string) : ""
     ).toLowerCase()
