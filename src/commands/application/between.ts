@@ -11,6 +11,7 @@ import { betweenCommon } from "../common/between.js"
 import { RTTStation } from "../../types.js"
 import { stationAutocomplete } from "./autocomplete/station.js"
 import { slashFailureResponse } from "../common/error.js"
+import { parseQueryTime } from "../common/queryTime.js"
 
 export const between = {
   name: "between",
@@ -29,6 +30,14 @@ export const between = {
         .setDescription("The station you will end your journey at")
         .setRequired(true)
         .setAutocomplete(true),
+    )
+    .addStringOption((option) =>
+      option
+        .setName("time")
+        .setDescription(
+          "Optional time today to search from, such as 14:30, 1430, or 2:30pm",
+        )
+        .setRequired(false),
     ),
   execute: async (
     interaction: APIChatInputApplicationCommandInteraction,
@@ -45,8 +54,17 @@ export const between = {
           APIApplicationCommandInteractionDataStringOption | undefined
       )?.value ?? null
 
+    const time = (
+      interaction.data.options?.find((o) => o.name === "time") as
+        APIApplicationCommandInteractionDataStringOption | undefined
+    )?.value
+
     try {
-      const embed = await betweenCommon(origin, destination)
+      const embed = await betweenCommon(
+        origin,
+        destination,
+        parseQueryTime(time),
+      )
 
       return {
         type: InteractionResponseType.ChannelMessageWithSource,
@@ -63,6 +81,15 @@ export const between = {
     const focused = interaction.data.options?.find(
       (o) => "focused" in o && o.focused,
     )
+    if (
+      !focused ||
+      (focused.name !== "origin" && focused.name !== "destination")
+    ) {
+      return {
+        type: InteractionResponseType.ApplicationCommandAutocompleteResult,
+        data: { choices: [] },
+      }
+    }
     const focusedValue = (
       focused && "value" in focused ? (focused.value as string) : ""
     ).toLowerCase()

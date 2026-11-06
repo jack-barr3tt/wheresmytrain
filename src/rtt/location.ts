@@ -23,10 +23,11 @@ function toResult(
 export async function fetchLocation(
   code: string,
   filterTo?: string,
+  timeFrom?: string,
 ): Promise<LocationResult> {
   const normalised = code.toUpperCase()
   const filter = filterTo?.toUpperCase()
-  const key = locationCacheKey(normalised, filter)
+  const key = locationCacheKey(normalised, filter, timeFrom)
   const cached = cacheGet<LocationResult>(key)
   if (cached) {
     return cached
@@ -35,6 +36,7 @@ export async function fetchLocation(
   const response = await getGbNrLocation({
     code: normalised,
     ...(filter ? { filterTo: filter } : {}),
+    ...(timeFrom ? { timeFrom } : {}),
     timeWindow: 300,
   })
 

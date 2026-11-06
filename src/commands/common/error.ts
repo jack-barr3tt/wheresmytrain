@@ -6,6 +6,7 @@ import {
 } from "discord-api-types/v10"
 import {
   InvalidQueryError,
+  InvalidTimeError,
   RateLimitedError,
   RttUnavailableError,
 } from "../../rtt/errors.js"
@@ -21,6 +22,12 @@ export function commandFailure(err: unknown): {
   if (err instanceof InvalidQueryError) {
     return {
       embed: error("That isn't a valid station. Try a name or CRS code."),
+      ephemeral: true,
+    }
+  }
+  if (err instanceof InvalidTimeError) {
+    return {
+      embed: error("That isn't a valid time. Try 14:30, 1430, or 2:30pm."),
       ephemeral: true,
     }
   }

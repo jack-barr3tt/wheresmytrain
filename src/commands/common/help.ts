@@ -11,8 +11,8 @@ export function helpCommon() {
       {
         name: "Commands",
         value:
-          "`/between` - Check times for services between two stations\n" +
-          "`/at` - Check times for services passing through a station\n" +
+          "`/between` - Services between two stations. Optional `time` (14:30, 1430, or 2:30pm) uses today\n" +
+          "`/at` - Services at a station. Optional `time` uses today\n" +
           "`/help` - Get this help message\n",
       },
     ])

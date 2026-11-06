@@ -15,6 +15,13 @@ export class InvalidQueryError extends RttError {
   }
 }
 
+export class InvalidTimeError extends RttError {
+  constructor() {
+    super("Invalid time", 400)
+    this.name = "InvalidTimeError"
+  }
+}
+
 export class RateLimitedError extends RttError {
   constructor(readonly retryAfterSeconds: number) {
     super(`Rate limited; retry after ${retryAfterSeconds}s`, 429)

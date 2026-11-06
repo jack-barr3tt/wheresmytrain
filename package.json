@@ -31,6 +31,7 @@
   "repository": "git@github.com:jack-barr3tt/discord-rtt.git",
   "dependencies": {
     "date-fns": "^3.3.1",
+    "date-fns-tz": "^3.2.0",
     "discord-api-types": "^0.37.90",
     "discord.js": "^14.14.1",
     "dotenv": "^16.4.1",
