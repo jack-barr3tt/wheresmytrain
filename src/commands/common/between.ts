@@ -2,7 +2,11 @@ import { EmbedBuilder } from "discord.js"
 import { InvalidQueryError } from "../../rtt/errors.js"
 import { fetchLocation } from "../../rtt/location.js"
 import { stationName } from "../../rtt/stations.js"
-import { formatServiceLine, isPassengerService } from "./formatService.js"
+import {
+  compareByRealtimeDeparture,
+  formatServiceLine,
+  isPassengerService,
+} from "./formatService.js"
 import type { QueryTime } from "./queryTime.js"
 
 export async function betweenCommon(
@@ -18,6 +22,7 @@ export async function betweenCommon(
   const destination = stationName(destinationCRS)
   const lines = origin.services
     .filter(isPassengerService)
+    .sort(compareByRealtimeDeparture)
     .slice(0, 5)
     .map((service) => formatServiceLine(service, { includeDestination: false }))
     .filter((line): line is string => Boolean(line))
