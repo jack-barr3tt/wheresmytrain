@@ -33,6 +33,16 @@ function activityTimes(service: NetworkRailLocationLineUpObject) {
   return { display: realtime ?? booked, booked, lateness }
 }
 
+/** Sort key: actual/forecast departure when known, otherwise booked. */
+export function compareByRealtimeDeparture(
+  a: NetworkRailLocationLineUpObject,
+  b: NetworkRailLocationLineUpObject,
+) {
+  const aTime = activityTimes(a).display?.getTime() ?? Number.POSITIVE_INFINITY
+  const bTime = activityTimes(b).display?.getTime() ?? Number.POSITIVE_INFINITY
+  return aTime - bTime
+}
+
 export function formatServiceLine(
   service: NetworkRailLocationLineUpObject,
   options: { includeDestination: boolean },

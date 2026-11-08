@@ -1,7 +1,11 @@
 import { EmbedBuilder } from "discord.js"
 import { InvalidQueryError } from "../../rtt/errors.js"
 import { fetchLocation } from "../../rtt/location.js"
-import { formatServiceLine, isPassengerService } from "./formatService.js"
+import {
+  compareByRealtimeDeparture,
+  formatServiceLine,
+  isPassengerService,
+} from "./formatService.js"
 import type { QueryTime } from "./queryTime.js"
 
 export async function atCommon(stationCRS: string | null, time?: QueryTime) {
@@ -12,6 +16,7 @@ export async function atCommon(stationCRS: string | null, time?: QueryTime) {
   const station = await fetchLocation(stationCRS, undefined, time?.timeFrom)
   const lines = station.services
     .filter(isPassengerService)
+    .sort(compareByRealtimeDeparture)
     .slice(0, 5)
     .map((service) => formatServiceLine(service, { includeDestination: true }))
     .filter((line): line is string => Boolean(line))
