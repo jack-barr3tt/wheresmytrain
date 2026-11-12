@@ -1,12 +1,13 @@
 import { Message } from "discord.js"
 import { betweenCommon } from "../common/between.js"
 import { commandFailure, error } from "../common/error.js"
+import { parseQueryTime } from "../common/queryTime.js"
 
 export default async function Upcoming(
   message: Message<boolean>,
   args: string[],
 ) {
-  if (args.length != 2) {
+  if (args.length < 2 || args.length > 3) {
     return await message.reply({
       embeds: [
         error(
@@ -28,7 +29,7 @@ export default async function Upcoming(
   }
 
   try {
-    const embed = await betweenCommon(args[0], args[1])
+    const embed = await betweenCommon(args[0], args[1], parseQueryTime(args[2]))
 
     await message.reply({ embeds: [embed] })
   } catch (err) {
